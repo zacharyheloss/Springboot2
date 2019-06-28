@@ -1,0 +1,40 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.0.BUILD-SNAPSHOT'
+	id 'java'
+	id 'war'
+	
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.zachary.springboot.blog'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	//mavenCentral()
+	maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+	//implementation 'org.springframework.boot:spring-boot-starter-jetty'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'mysql:mysql-connector-java:6.0.5'
+	implementation 'org.projectlombok:lombok:1.16.20'
+	implementation 'net.java.dev.jna:jna:4.3.0'
+	runtimeOnly 'com.h2database:h2:1.4.193'
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+		exclude group: 'junit', module: 'junit'
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
