@@ -8,6 +8,8 @@ spring:
   profiles:
     active:
     - dev
+  mvc:
+    dispatch-options-request: true
   datasource: 
       name: springboot2mysql
       master:
