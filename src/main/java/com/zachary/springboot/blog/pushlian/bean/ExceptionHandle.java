@@ -1,4 +1,4 @@
-package com.zachary.springboot.blog.pushlian.rest;
+package com.zachary.springboot.blog.pushlian.bean;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

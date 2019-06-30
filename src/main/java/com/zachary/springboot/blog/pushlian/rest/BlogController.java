@@ -1,7 +1,5 @@
 package com.zachary.springboot.blog.pushlian.rest;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -9,34 +7,26 @@ import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.zachary.springboot.blog.pushlian.damain.Esblog;
-import com.zachary.springboot.blog.pushlian.dao.EsblogRepository;
+import com.zachary.springboot.blog.pushlian.damain.RoncooUser;
+import com.zachary.springboot.blog.pushlian.service.IDemoService;
 
 @RestController
 public class BlogController {
 	
 	@Resource
-	private EsblogRepository esblogRepository;
+	private IDemoService demoService;
 	
-	@RequestMapping("/es/1")
-	public String es1() {
-		esblogRepository.save(new Esblog("»Æº×Â¥", "ÍøÈªÖÝÖ®»Æº×Â¥", "cwncwbwfwp1p0319382ub2"));
-		esblogRepository.save(new Esblog("ºÚÒ¹", "ÍøÈªÖÝÖ®ºÚÒ¹", "hhhhcwncwbwfwp1p0319382ub2"));
-		esblogRepository.save(new Esblog("Î÷Â¥", "ÍøÈªÖÝÖ®Î÷Â¥", "jjjjjp1p0319382ub2"));
-		
-		return "Es Successful!";
+	@RequestMapping("/blog/1")
+	public List<RoncooUser> es1() {
+		List<RoncooUser> useList=demoService.queryAll();
+		return useList;
 	}
 	
-	@RequestMapping("/es/2")
-	public Object es2() {
-		Iterator<Esblog> iter=esblogRepository.findAll().iterator();
-		List<Esblog> esblogList=new ArrayList<Esblog>();
-		while(iter.hasNext()) {
-			Esblog esblog=iter.next();
-			esblogList.add(esblog);
-		}
-		
-		return esblogList;
+	
+	@RequestMapping("/blog/2")
+	public RoncooUser es2() {
+		RoncooUser roncooUser=demoService.queryById(10);
+		return roncooUser;
 	}
 	
 

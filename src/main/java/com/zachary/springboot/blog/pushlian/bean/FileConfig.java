@@ -8,7 +8,7 @@ import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@PropertySources(value ={@PropertySource("classpath:jdbc.properties")})
+@PropertySources(value ={@PropertySource("classpath:jdbc.properties")}) 
 public class FileConfig {
 	
 	//@Bean(name = "myDog",initMethod = "init" ,destroyMethod = "destory")

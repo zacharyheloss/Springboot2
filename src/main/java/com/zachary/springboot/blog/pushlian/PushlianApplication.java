@@ -1,5 +1,6 @@
 package com.zachary.springboot.blog.pushlian;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
@@ -13,8 +14,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * @desc ≈≈≥˝ƒ¨»œµƒ¥ÌŒÛ ”Õº
  *
  */
-@EnableAspectJAutoProxy
-@SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
 /*
  * @ComponentScan(value = "com.zachary")
  * 
@@ -22,6 +21,10 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * 
  * @EnableJpaRepositories("com.zachary.dao")
  */
+
+@EnableAspectJAutoProxy
+@SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
+@MapperScan("com.zachary.springboot.blog.pushlian.dao")
 public class PushlianApplication extends SpringBootServletInitializer{
 
 	@Override
