@@ -1,22 +1,18 @@
 package com.zachary.springboot.blog.pushlian.mrdatasource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 /**
  * @Auther: 
  * @Date: 
- * @Description: ¶¯Ì¬Êı¾İÔ´Â·ÓÉÅäÖÃ
+ * @Description: æ•°æ®æºåˆ‡æ¢
  */
 public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
 
-    private static Logger logger = LoggerFactory.getLogger(DynamicRoutingDataSource.class);
 
     @Override
     protected Object determineCurrentLookupKey() {
-        String dataSourceName = DynamicDataSourceContextHolder.getDataSourceRouterKey();
-        logger.info("µ±Ç°Êı¾İÔ´ÊÇ£º{}", dataSourceName);
+        //String dataSourceName = DynamicDataSourceContextHolder.getDataSourceRouterKey();
         return DynamicDataSourceContextHolder.getDataSourceRouterKey();
     }
 }

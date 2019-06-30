@@ -7,11 +7,14 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConf
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
+
+import com.zachary.springboot.blog.pushlian.mrdatasource.DynamicDataSourceRegister;
 
 /**
  * 
  * @author zachary
- * @desc ≈≈≥˝ƒ¨»œµƒ¥ÌŒÛ ”Õº
+ * @desc ÂêØÂä®Á±ª
  *
  */
 /*
@@ -25,6 +28,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableAspectJAutoProxy
 @SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
 @MapperScan("com.zachary.springboot.blog.pushlian.dao")
+@Import(DynamicDataSourceRegister.class)
 public class PushlianApplication extends SpringBootServletInitializer{
 
 	@Override

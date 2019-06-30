@@ -19,7 +19,7 @@ public class FileConfig {
 	@Autowired
 	private Environment env;
 	
-	@Value("${spring.datasource.url}")
+	/* @Value("${spring.datasource.url}") */
 	private String url;
 	
 	public void show() {

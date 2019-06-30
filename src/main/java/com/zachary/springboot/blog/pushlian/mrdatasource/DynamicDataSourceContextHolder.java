@@ -3,25 +3,21 @@ package com.zachary.springboot.blog.pushlian.mrdatasource;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * @Auther: 
- * @Date: 
- * @Description: Êı¾İÔ´ÉÏÏÂÎÄ
+ * @Auther:
+ * @Date:
+ * @Description:åŠ¨æ€ä»£ç†åˆ‡æ¢
  */
 public class DynamicDataSourceContextHolder {
 
-	private static Logger logger = LoggerFactory.getLogger(DynamicDataSourceContextHolder.class);
 
 	/**
-	 * ´æ´¢ÒÑ¾­×¢²áµÄÊı¾İÔ´µÄkey
+	 * å­˜å‚¨å·²ç»æ³¨å†Œçš„æ•°æ®æºçš„key
 	 */
 	public static List<String> dataSourceIds = new ArrayList<>();
 
 	/**
-	 * Ïß³Ì¼¶±ğµÄË½ÓĞ±äÁ¿
+	 * çº¿ç¨‹çº§åˆ«çš„ç§æœ‰å˜é‡
 	 */
 	private static final ThreadLocal<String> HOLDER = new ThreadLocal<>();
 
@@ -30,19 +26,18 @@ public class DynamicDataSourceContextHolder {
 	}
 
 	public static void setDataSourceRouterKey(String dataSourceRouterKey) {
-		logger.info("ÇĞ»»ÖÁ{}Êı¾İÔ´", dataSourceRouterKey);
 		HOLDER.set(dataSourceRouterKey);
 	}
 
 	/**
-	 * ÉèÖÃÊı¾İÔ´Ö®Ç°Ò»¶¨ÒªÏÈÒÆ³ı
+	 * è®¾ç½®æ•°æ®æºä¹‹å‰ä¸€å®šè¦å…ˆç§»é™¤
 	 */
 	public static void removeDataSourceRouterKey() {
 		HOLDER.remove();
 	}
 
 	/**
-	 * ÅĞ¶ÏÖ¸¶¨DataSrouceµ±Ç°ÊÇ·ñ´æÔÚ
+	 * åˆ¤æ–­æŒ‡å®šDataSrouceå½“å‰æ˜¯å¦å­˜åœ¨
 	 *
 	 * @param dataSourceId
 	 * @return

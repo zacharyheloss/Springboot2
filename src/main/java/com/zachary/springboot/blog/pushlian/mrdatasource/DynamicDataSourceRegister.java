@@ -1,167 +1,271 @@
-/*
- * package com.zachary.springboot.blog.pushlian.mrdatasource;
+package com.zachary.springboot.blog.pushlian.mrdatasource;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+import org.springframework.boot.context.properties.source.ConfigurationPropertyNameAliases;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.env.Environment;
+import org.springframework.core.type.AnnotationMetadata;
+
+import com.alibaba.druid.pool.DruidDataSource;
+import com.zaxxer.hikari.HikariDataSource;
+
+/**
  * 
- * import java.util.HashMap; import java.util.List; import java.util.Map;
- * 
- * import javax.sql.DataSource;
- * 
- * import org.apache.commons.lang3.StringUtils; import org.slf4j.Logger; import
- * org.slf4j.LoggerFactory; import
- * org.springframework.beans.MutablePropertyValues; import
- * org.springframework.beans.factory.support.BeanDefinitionRegistry; import
- * org.springframework.beans.factory.support.GenericBeanDefinition; import
- * org.springframework.boot.context.properties.bind.Bindable; import
- * org.springframework.boot.context.properties.bind.Binder; import
- * org.springframework.boot.context.properties.source.ConfigurationPropertyName;
- * import org.springframework.boot.context.properties.source.
- * ConfigurationPropertyNameAliases; import
- * org.springframework.boot.context.properties.source.
- * ConfigurationPropertySource; import
- * org.springframework.boot.context.properties.source.
- * MapConfigurationPropertySource; import
- * org.springframework.context.EnvironmentAware; import
- * org.springframework.context.annotation.ImportBeanDefinitionRegistrar; import
- * org.springframework.core.env.Environment; import
- * org.springframework.core.type.AnnotationMetadata;
- * 
- * import com.zaxxer.hikari.HikariDataSource;
- * 
- *//**
-	 * ¶¯Ì¬Êı¾İÔ´×¢²á ÊµÏÖ ImportBeanDefinitionRegistrar ÊµÏÖÊı¾İÔ´×¢²á ÊµÏÖ EnvironmentAware
-	 * ÓÃÓÚ¶ÁÈ¡application.ymlÅäÖÃ
-	 * 
-	 * @param <V>
+ * @author zachary
+ * @desc 
+ * 1.è·å–ä¸Šä¸‹æ–‡ä¸­ç¯å¢ƒå˜é‡
+ * 2.æ•°æ®æºæ„å»º
+ * 3.æ•°æ®æºæ³¨å†Œ
+ *
+ */
+public class DynamicDataSourceRegister implements EnvironmentAware, ImportBeanDefinitionRegistrar {
+
+	private static final Logger logger = LoggerFactory.getLogger(DynamicDataSourceRegister.class);
+	/**
+	 *  ä¸»æ•°æ®æºã€ä»æ•°æ®æº
 	 */
-/*
- * public class DynamicDataSourceRegister<V> implements
- * ImportBeanDefinitionRegistrar, EnvironmentAware {
- * 
- * private static final Logger logger =
- * LoggerFactory.getLogger(DynamicDataSourceRegister.class);
- * 
- *//**
-	 * ÅäÖÃÉÏÏÂÎÄ£¨Ò²¿ÉÒÔÀí½âÎªÅäÖÃÎÄ¼şµÄ»ñÈ¡¹¤¾ß£©
+	private final String msDataSource="master";
+	private final String msDataSourceNode="spring.datasource.master";
+	private final String msDataSourceNodeType="spring.datasource.master.type";
+	private final String csDataSourceNode="spring.datasource.cluster";
+
+	/**
+	 * é…ç½®ä¸Šä¸‹æ–‡ï¼ˆä¹Ÿå¯ä»¥ç†è§£ä¸ºé…ç½®æ–‡ä»¶çš„è·å–å·¥å…·ï¼‰
 	 */
-/*
- * private Environment evn;
- * 
- *//**
-	 * ±ğÃû
+	private Environment evn;
+
+	/**
+	 * åˆ«å
 	 */
-/*
- * private final static ConfigurationPropertyNameAliases aliases = new
- * ConfigurationPropertyNameAliases();
- * 
- *//**
-	 * ÓÉÓÚ²¿·ÖÊı¾İÔ´ÅäÖÃ²»Í¬£¬ËùÒÔÔÚ´Ë´¦Ìí¼Ó±ğÃû£¬±ÜÃâÇĞ»»Êı¾İÔ´³öÏÖÄ³Ğ©²ÎÊıÎŞ·¨×¢ÈëµÄÇé¿ö
+	private final static ConfigurationPropertyNameAliases aliases = new ConfigurationPropertyNameAliases();
+
+	/**
+	 * ç”±äºéƒ¨åˆ†æ•°æ®æºé…ç½®ä¸åŒï¼Œæ‰€ä»¥åœ¨æ­¤å¤„æ·»åŠ åˆ«åï¼Œé¿å…åˆ‡æ¢æ•°æ®æºå‡ºç°æŸäº›å‚æ•°æ— æ³•æ³¨å…¥çš„æƒ…å†µ
 	 */
-/*
- * static { aliases.addAliases("url", new String[] { "jdbc-url" });
- * aliases.addAliases("username", new String[] { "user" }); }
- * 
- *//**
-	 * ´æ´¢ÎÒÃÇ×¢²áµÄÊı¾İÔ´
+	static {
+		aliases.addAliases("url", new String[] { "jdbc-url" });
+		aliases.addAliases("username", new String[] { "user" });
+		//aliases.addAliases("initialSize", new String[] { "initial-size" });
+		//aliases.addAliases("initial-size", new String[] { "initial-size" });
+	}
+
+	/**
+	 * å­˜å‚¨æˆ‘ä»¬æ³¨å†Œçš„æ•°æ®æº
 	 */
-/*
- * private Map<String, DataSource> customDataSources = new HashMap<String,
- * DataSource>();
- * 
- * 
- *//**
-	 * ImportBeanDefinitionRegistrar½Ó¿ÚµÄÊµÏÖ·½·¨£¬Í¨¹ı¸Ã·½·¨¿ÉÒÔ°´ÕÕ×Ô¼ºµÄ·½Ê½×¢²ábean
+	private Map<String, DataSource> customDataSources = new HashMap<String, DataSource>();
+
+	/**
+	 * å‚æ•°ç»‘å®šå·¥å…· springboot2.0æ–°æ¨å‡º
+	 */
+	private Binder binder;
+
+	/**
+	 * ImportBeanDefinitionRegistraræ¥å£çš„å®ç°æ–¹æ³•ï¼Œé€šè¿‡è¯¥æ–¹æ³•å¯ä»¥æŒ‰ç…§è‡ªå·±çš„æ–¹å¼æ³¨å†Œbean
 	 *
 	 * @param annotationMetadata
 	 * @param beanDefinitionRegistry
 	 */
-/*
- * @Override public void registerBeanDefinitions(AnnotationMetadata
- * annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) { //
- * »ñÈ¡ËùÓĞÊı¾İÔ´ÅäÖÃ Map config, defauleDataSourceProperties;
- * defauleDataSourceProperties = binder.bind("spring.datasource.master",
- * Map.class).get(); // »ñÈ¡Êı¾İÔ´ÀàĞÍ String typeStr =
- * evn.getProperty("spring.datasource.master.type"); // »ñÈ¡Êı¾İÔ´ÀàĞÍ Class<? extends
- * DataSource> clazz = getDataSourceType(typeStr); // °ó¶¨Ä¬ÈÏÊı¾İÔ´²ÎÊı Ò²¾ÍÊÇÖ÷Êı¾İÔ´
- * DataSource consumerDatasource, defaultDatasource = bind(clazz,
- * defauleDataSourceProperties);
- * DynamicDataSourceContextHolder.dataSourceIds.add("master");
- * logger.info("×¢²áÄ¬ÈÏÊı¾İÔ´³É¹¦"); // »ñÈ¡ÆäËûÊı¾İÔ´ÅäÖÃ List<Map> configs =
- * binder.bind("spring.datasource.cluster", Bindable.listOf(Map.class)).get();
- * // ±éÀú´ÓÊı¾İÔ´ for (int i = 0; i < configs.size(); i++) { config = configs.get(i);
- * clazz = getDataSourceType((String) config.get("type"));
- * defauleDataSourceProperties = config; // °ó¶¨²ÎÊı consumerDatasource =
- * bind(clazz, defauleDataSourceProperties); // »ñÈ¡Êı¾İÔ´µÄkey£¬ÒÔ±ãÍ¨¹ı¸Ãkey¿ÉÒÔ¶¨Î»µ½Êı¾İÔ´
- * String key = config.get("key").toString(); customDataSources.put(key,
- * consumerDatasource); // Êı¾İÔ´ÉÏÏÂÎÄ£¬ÓÃÓÚ¹ÜÀíÊı¾İÔ´Óë¼ÇÂ¼ÒÑ¾­×¢²áµÄÊı¾İÔ´key
- * DynamicDataSourceContextHolder.dataSourceIds.add(key);
- * logger.info("×¢²áÊı¾İÔ´{}³É¹¦", key); } // bean¶¨ÒåÀà GenericBeanDefinition define =
- * new GenericBeanDefinition(); //
- * ÉèÖÃbeanµÄÀàĞÍ£¬´Ë´¦DynamicRoutingDataSourceÊÇ¼Ì³ĞAbstractRoutingDataSourceµÄÊµÏÖÀà
- * define.setBeanClass(DynamicRoutingDataSource.class); // ĞèÒª×¢ÈëµÄ²ÎÊı
- * MutablePropertyValues mpv = define.getPropertyValues(); //
- * Ìí¼ÓÄ¬ÈÏÊı¾İÔ´£¬±ÜÃâkey²»´æÔÚµÄÇé¿öÃ»ÓĞÊı¾İÔ´¿ÉÓÃ mpv.add("defaultTargetDataSource",
- * defaultDatasource); // Ìí¼ÓÆäËûÊı¾İÔ´ mpv.add("targetDataSources",
- * customDataSources); // ½«¸Ãbean×¢²áÎªdatasource£¬²»Ê¹ÓÃspringboot×Ô¶¯Éú³ÉµÄdatasource
- * beanDefinitionRegistry.registerBeanDefinition("datasource", define);
- * logger.info("×¢²áÊı¾İÔ´³É¹¦£¬Ò»¹²×¢²á{}¸öÊı¾İÔ´", customDataSources.keySet().size() + 1); }
- * 
- *//**
-	 * Í¨¹ı×Ö·û´®»ñÈ¡Êı¾İÔ´class¶ÔÏó
+	@SuppressWarnings({"unchecked","rawtypes"})
+	@Override
+	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata,
+			BeanDefinitionRegistry beanDefinitionRegistry) {
+		// è·å–æ‰€æœ‰æ•°æ®æºé…ç½®
+		Map<String,Object> config, defauleDataSourceProperties;
+		defauleDataSourceProperties = binder.bind(msDataSourceNode, Map.class).get();
+		// è·å–æ•°æ®æºç±»å‹
+		String typeStr = evn.getProperty(msDataSourceNodeType);
+		// è·å–æ•°æ®æºç±»å‹
+		Class<? extends DataSource> clazz = getDataSourceType(typeStr);
+		// ç»‘å®šé»˜è®¤æ•°æ®æºå‚æ•° ä¹Ÿå°±æ˜¯ä¸»æ•°æ®æº
+		DataSource consumerDatasource, defaultDatasource = this.bind(clazz, defauleDataSourceProperties);
+		DynamicDataSourceContextHolder.dataSourceIds.add(msDataSource);
+		logger.info("æ³¨å†Œä¸»æ•°æ®æºæˆåŠŸ,type:{}",msDataSource);
+		// è·å–å…¶ä»–æ•°æ®æºé…ç½®
+		List<Map> configs = binder.bind(csDataSourceNode, Bindable.listOf(Map.class)).get();
+		// éå†ä»æ•°æ®æº
+		for (int i = 0; i < configs.size(); i++) {
+			config = configs.get(i);
+			clazz = getDataSourceType((String) config.get("type"));
+			defauleDataSourceProperties = config;
+			// ç»‘å®šå‚æ•°
+			consumerDatasource = bind(clazz, defauleDataSourceProperties);
+			// è·å–æ•°æ®æºçš„keyï¼Œä»¥ä¾¿é€šè¿‡è¯¥keyå¯ä»¥å®šä½åˆ°æ•°æ®æº
+			String key = config.get("key").toString();
+			customDataSources.put(key, consumerDatasource);
+			// æ•°æ®æºä¸Šä¸‹æ–‡ï¼Œç”¨äºç®¡ç†æ•°æ®æºä¸è®°å½•å·²ç»æ³¨å†Œçš„æ•°æ®æºkey
+			DynamicDataSourceContextHolder.dataSourceIds.add(key);
+			logger.info("æ³¨å†Œæ•°æ®æº{}æˆåŠŸ", key);
+		}
+		// beanå®šä¹‰ç±»
+		GenericBeanDefinition define = new GenericBeanDefinition();
+		// è®¾ç½®beançš„ç±»å‹ï¼Œæ­¤å¤„DynamicRoutingDataSourceæ˜¯ç»§æ‰¿AbstractRoutingDataSourceçš„å®ç°ç±»
+		define.setBeanClass(DynamicRoutingDataSource.class);
+		// éœ€è¦æ³¨å…¥çš„å‚æ•°
+		MutablePropertyValues mpv = define.getPropertyValues();
+		// æ·»åŠ é»˜è®¤æ•°æ®æºä¸»åº“ï¼Œé¿å…keyä¸å­˜åœ¨çš„æƒ…å†µæ²¡æœ‰æ•°æ®æºå¯ç”¨
+		mpv.add("defaultTargetDataSource", defaultDatasource);
+		// æ·»åŠ å…¶ä»–æ•°æ®æº
+		mpv.add("targetDataSources", customDataSources);
+		// å°†è¯¥beanæ³¨å†Œä¸ºdatasourceï¼Œä¸ä½¿ç”¨springbootè‡ªåŠ¨ç”Ÿæˆçš„datasource
+		beanDefinitionRegistry.registerBeanDefinition("datasource", define);
+		logger.info("æ³¨å†Œæ•°æ®æºæˆåŠŸï¼Œä¸€å…±æ³¨å†Œ{}ä¸ªæ•°æ®æº", customDataSources.keySet().size() + 1);
+	}
+
+	/**
+	 * é€šè¿‡å­—ç¬¦ä¸²è·å–æ•°æ®æºclasså¯¹è±¡
 	 *
 	 * @param typeStr
 	 * @return
 	 */
-/*
- * @SuppressWarnings("unchecked") private Class<? extends DataSource>
- * getDataSourceType(String typeStr) { Class<? extends DataSource> type; try {
- * if (!StringUtils.isBlank(typeStr)) { //²»Îª¿Õ£¬»ñÈ¡»ñÈ¡ÅäÖÃ type = (Class<? extends
- * DataSource>) Class.forName(typeStr); } else { //
- * Ä¬ÈÏÎªhikariCPÊı¾İÔ´£¬ÓëspringbootÄ¬ÈÏÊı¾İÔ´±£³ÖÒ»ÖÂ type = HikariDataSource.class; } return
- * type; } catch (Exception e) { throw new
- * IllegalArgumentException("can not resolve class with type: " + typeStr);
- * //ÎŞ·¨Í¨¹ı·´Éä»ñÈ¡class¶ÔÏóµÄÇé¿öÔòÅ×³öÒì³££¬¸ÃÇé¿öÒ»°ãÊÇĞ´´íÁË£¬ËùÒÔ´Ë´ÎÅ×³öÒ»¸öruntimeexception } }
- * 
- *//**
-	 * °ó¶¨²ÎÊı£¬ÒÔÏÂÈı¸ö·½·¨¶¼ÊÇ²Î¿¼DataSourceBuilderµÄbind·½·¨ÊµÏÖµÄ£¬Ä¿µÄÊÇ¾¡Á¿±£Ö¤ÎÒÃÇ×Ô¼ºÌí¼ÓµÄÊı¾İÔ´¹¹Ôì¹ı³ÌÓëspringboot±£³ÖÒ»ÖÂ
+	@SuppressWarnings("unchecked")
+	private Class<? extends DataSource> getDataSourceType(String typeStr) {
+		Class<? extends DataSource> type;
+		try {
+			if (!StringUtils.isBlank(typeStr)) {
+				// å­—ç¬¦ä¸²ä¸ä¸ºç©ºåˆ™é€šè¿‡åå°„è·å–classå¯¹è±¡
+				type = (Class<? extends DataSource>) Class.forName(typeStr);
+			} else {
+				// é»˜è®¤ä¸ºhikariCPæ•°æ®æºï¼Œä¸springbooté»˜è®¤æ•°æ®æºä¿æŒä¸€è‡´
+				type = HikariDataSource.class;
+			}
+			return type;
+		} catch (Exception e) {
+			throw new IllegalArgumentException("can not resolve class with type: " + typeStr); // æ— æ³•é€šè¿‡åå°„è·å–classå¯¹è±¡çš„æƒ…å†µåˆ™æŠ›å‡ºå¼‚å¸¸ï¼Œè¯¥æƒ…å†µä¸€èˆ¬æ˜¯å†™é”™äº†ï¼Œæ‰€ä»¥æ­¤æ¬¡æŠ›å‡ºä¸€ä¸ªruntimeexception
+		}
+	}
+
+	/**
+	 * ç»‘å®šå‚æ•°ï¼Œä»¥ä¸‹ä¸‰ä¸ªæ–¹æ³•éƒ½æ˜¯å‚è€ƒDataSourceBuilderçš„bindæ–¹æ³•å®ç°çš„ï¼Œç›®çš„æ˜¯å°½é‡ä¿è¯æˆ‘ä»¬è‡ªå·±æ·»åŠ çš„æ•°æ®æºæ„é€ è¿‡ç¨‹ä¸springbootä¿æŒä¸€è‡´
 	 *
 	 * @param result
 	 * @param properties
 	 */
-/*
- * @SuppressWarnings("unused") private void bind(DataSource result, Map
- * properties) { ConfigurationPropertySource source = new
- * MapConfigurationPropertySource(properties); Binder binder = new Binder(new
- * ConfigurationPropertySource[]{source.withAliases(aliases)}); // ½«²ÎÊı°ó¶¨µ½¶ÔÏó
- * binder.bind(ConfigurationPropertyName.EMPTY, Bindable.ofInstance(result)); }
- * 
- * private <T extends DataSource> T bind(Class<T> clazz, Map properties) {
- * ConfigurationPropertySource source = new
- * MapConfigurationPropertySource(properties); Binder binder = new Binder(new
- * ConfigurationPropertySource[]{source.withAliases(aliases)}); //
- * Í¨¹ıÀàĞÍ°ó¶¨²ÎÊı²¢»ñµÃÊµÀı¶ÔÏó return binder.bind(ConfigurationPropertyName.EMPTY,
- * Bindable.of(clazz)).get(); }
- * 
- *//**
+	/*
+	 * @SuppressWarnings("unused") private void bind(DataSource result,
+	 * Map<String,Object> properties) { ConfigurationPropertySource source = new
+	 * MapConfigurationPropertySource(properties); Binder binder = new Binder(new
+	 * ConfigurationPropertySource[] { source.withAliases(aliases) }); // å°†å‚æ•°ç»‘å®šåˆ°å¯¹è±¡
+	 * binder.bind(ConfigurationPropertyName.EMPTY, Bindable.ofInstance(result)); }
+	 */
+
+	/**
+	   *  ç»‘å®šå‚æ•°ï¼Œä»¥ä¸‹ä¸‰ä¸ªæ–¹æ³•éƒ½æ˜¯å‚è€ƒDataSourceBuilderçš„bindæ–¹æ³•å®ç°çš„ï¼Œç›®çš„æ˜¯å°½é‡ä¿è¯æˆ‘ä»¬è‡ªå·±æ·»åŠ çš„æ•°æ®æºæ„é€ è¿‡ç¨‹ä¸springbootä¿æŒä¸€è‡´
+	 *
+	 * @param result
+	 * @param properties
+	 */
+	@SuppressWarnings({ "rawtypes" })
+	private <T extends DataSource> T bind(Class<T> clazz, Map properties) {
+		ConfigurationPropertySource source = new MapConfigurationPropertySource(properties);
+		Binder binder = new Binder(new ConfigurationPropertySource[] { source.withAliases(aliases) });
+		// é€šè¿‡ç±»å‹ç»‘å®šå‚æ•°å¹¶è·å¾—å®ä¾‹å¯¹è±¡
+		T t=binder.bind(ConfigurationPropertyName.EMPTY, Bindable.of(clazz)).get();
+		if(t instanceof DruidDataSource) {//ç”±äºä¸åŒæ•°æ®æºæœªè‡ªåŠ¨è£…é…å‚æ•°ï¼Œæ•…éœ€è¦æ‰‹åŠ¨è®¾ç½®
+			this.rmdDataSourceParams(t);
+		}
+		return t;
+	}
+	
+	/**
+	 * @desc åˆå§‹åŒ– æ•°æ®åº“å‚æ•°åˆ° DruidDataSource å®ä¾‹å¯¹è±¡
+	 * @date 
+	 */
+	public void rmdDataSourceParams(DataSource dataSource) {
+		DruidDataSource druidDataSource=(DruidDataSource)dataSource; 
+		String initialSize=evn.getProperty("spring.datasource.druid.initial-size");
+		String maxActive=evn.getProperty("spring.datasource.druid.max-active");
+		String maxWait=evn.getProperty("spring.datasource.druid.max-wait");
+		String minIdle=evn.getProperty("spring.datasource.druid.min-idle");
+		String timeBetweenEvictionRunsMillis=evn.getProperty("spring.datasource.druid.time-between-eviction-runs-millis");
+		String minEvictableIdleTimeMillis=evn.getProperty("spring.datasource.druid.min-evictable-idle-time-millis");
+		String validationQuery=evn.getProperty("spring.datasource.druid.validation-query");
+		String testWhileIdle=evn.getProperty("spring.datasource.druid.test-while-idle");
+		String testOnBorrow=evn.getProperty("spring.datasource.druid.test-on-borrow");
+		String testOnReturn=evn.getProperty("spring.datasource.druid.test-on-return");
+		String poolPreparedStatements=evn.getProperty("spring.datasource.druid.pool-prepared-statements");
+		String maxOpenPreparedStatements=evn.getProperty("spring.datasource.druid.max-open-prepared-statements");
+		String maxPoolPreparedStatementPerConnectionSize=evn.getProperty("spring.datasource.druid.max-pool-prepared-statement-per-connection-size");
+		//è®¾ç½®
+		if(!StringUtils.isBlank(initialSize)) {
+			druidDataSource.setInitialSize(Integer.parseInt(initialSize)); 
+		} 
+		if(!StringUtils.isBlank(maxActive)) {
+			druidDataSource.setMaxActive(Integer.parseInt(maxActive)); 
+		} 
+		if(!StringUtils.isBlank(maxWait)) {
+			druidDataSource.setMaxWait(Long.parseLong(maxWait)); 
+		} 
+		if(!StringUtils.isBlank(minIdle)) {
+			druidDataSource.setMinIdle(Integer.parseInt(minIdle)); 
+		} 
+		if(!StringUtils.isBlank(timeBetweenEvictionRunsMillis)) {
+			druidDataSource.setTimeBetweenEvictionRunsMillis(Long.parseLong(timeBetweenEvictionRunsMillis)); 
+		} 
+		if(!StringUtils.isBlank(minEvictableIdleTimeMillis)) {
+			druidDataSource.setMinEvictableIdleTimeMillis(Long.parseLong(minEvictableIdleTimeMillis)); 
+		} 
+		if(!StringUtils.isBlank(validationQuery)) {
+			druidDataSource.setValidationQuery(validationQuery); 
+		} 
+		if(!StringUtils.isBlank(testWhileIdle)) {
+			druidDataSource.setTestWhileIdle(Boolean.parseBoolean(testWhileIdle)); 
+		} 
+		if(!StringUtils.isBlank(testOnBorrow)) {
+			druidDataSource.setTestOnBorrow(Boolean.parseBoolean(testOnBorrow)); 
+		} 
+		if(!StringUtils.isBlank(testOnReturn)) {
+			druidDataSource.setTestOnReturn(Boolean.parseBoolean(testOnReturn)); 
+		} 
+		if(!StringUtils.isBlank(poolPreparedStatements)) {
+			druidDataSource.setPoolPreparedStatements(Boolean.parseBoolean(poolPreparedStatements)); 
+		} 
+		if(!StringUtils.isBlank(maxOpenPreparedStatements)) {
+			druidDataSource.setMaxOpenPreparedStatements(Integer.parseInt(initialSize)); 
+		} 
+		if(!StringUtils.isBlank(maxPoolPreparedStatementPerConnectionSize)) {
+			druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(Integer.parseInt(maxPoolPreparedStatementPerConnectionSize)); 
+		} 
+	}
+
+	/**
 	 * @param clazz
-	 * @param sourcePath ²ÎÊıÂ·¾¶£¬¶ÔÓ¦ÅäÖÃÎÄ¼şÖĞµÄÖµ£¬Èç: spring.datasource
+	 * @param sourcePath å‚æ•°è·¯å¾„ï¼Œå¯¹åº”é…ç½®æ–‡ä»¶ä¸­çš„å€¼ï¼Œå¦‚: spring.datasource
 	 * @param <T>
 	 * @return
 	 */
-/*
- * private <T extends DataSource> T bind(Class<T> clazz, String sourcePath) {
- * Map properties = binder.bind(sourcePath, Map.class).get(); return bind(clazz,
- * properties); }
- * 
- * 
- * 
- * 
- *//**
-	 * ²ÎÊı°ó¶¨¹¤¾ß springboot2.0ĞÂÍÆ³ö
-	 *//*
-		 * private Binder binder;
-		 * 
-		 * @Override public void setEnvironment(Environment environment) {
-		 * logger.info("¿ªÊ¼×¢²áÊı¾İÔ´"); this.evn = environment; // °ó¶¨ÅäÖÃÆ÷ binder =
-		 * Binder.get(evn); }
-		 * 
-		 * }
-		 */
+	@SuppressWarnings({ "unused", "rawtypes" })
+	private <T extends DataSource> T bind(Class<T> clazz, String sourcePath) {
+		Map properties = binder.bind(sourcePath, Map.class).get();
+		return this.bind(clazz, properties);
+	}
+
+	/**
+	 * EnvironmentAwareæ¥å£çš„å®ç°æ–¹æ³•ï¼Œé€šè¿‡awareçš„æ–¹å¼æ³¨å…¥ï¼Œæ­¤å¤„æ˜¯environmentå¯¹è±¡
+	 *
+	 * @param environment
+	 */
+	@Override
+	public void setEnvironment(Environment environment) {
+		logger.info("å¼€å§‹æ³¨å†Œæ•°æ®æº");
+		this.evn = environment;
+		// ç»‘å®šé…ç½®å™¨
+		binder = Binder.get(evn);
+	}
+}

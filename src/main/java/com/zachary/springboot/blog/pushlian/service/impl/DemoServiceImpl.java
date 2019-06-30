@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zachary.springboot.blog.pushlian.damain.RoncooUser;
 import com.zachary.springboot.blog.pushlian.dao.UserMapper;
@@ -19,12 +20,14 @@ public class DemoServiceImpl implements IDemoService{
 
 	@Override
 	@DataSource
+	@Transactional(readOnly = true)
 	public List<RoncooUser> queryAll() {
 		return userMapper.queryAll();
 	}
 
 	@Override
 	@DataSource("slave1")
+	@Transactional(readOnly = true)
 	public RoncooUser queryById(Integer id) {
 		return userMapper.selectByPrimaryKey(10);
 	}
