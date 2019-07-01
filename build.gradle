@@ -36,10 +36,10 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt:0.9.0'
 	implementation 'com.google.code.gson:gson:2.6.1'
 	implementation 'org.apache.httpcomponents:httpclient:4.4.1'
-	implementation 'org.apache.commons:commons-codec:1.7'
+	implementation 'commons-codec:commons-codec:1.7'
 	implementation 'commons-logging:commons-logging:1.1.1'
 	implementation 'commons-beanutils:commons-beanutils:1.8.3'
-
+	implementation 'com.google.guava:guava:27.0.1-jre'
 	runtimeOnly 'com.h2database:h2:1.4.193'
 	implementation 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
