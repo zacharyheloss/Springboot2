@@ -31,7 +31,7 @@ public class AccessTokenInterceptor implements HandlerInterceptor {
 		response.setHeader("Access-Control-Max-Age", "3600");
 		response.setHeader("jwttoken", "1111");
 		response.addHeader("Access-Control-Expose-Headers", "jwttoken");
-		//response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type,jwttoken,Authorization");
+		response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 		
 		// 如果是OPTIONS请求则结束
 		if (HttpMethod.OPTIONS.toString().equals(request.getMethod())) {
