@@ -11,6 +11,8 @@ spring容器特性 ： 拦截器+ 过滤器+全局异常处理
 
 前后端交互 跨域+自定义header
 
+集成jsp-jstl、编译成War单独部署tomcat、jetty可正常访问
+
  集成redis集群 （底层通过lettuce 连接客户端，lettuce基于netty多线程并发性能高）
 
 
