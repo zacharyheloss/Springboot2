@@ -53,7 +53,7 @@
 
     <!-- 生产环境下的日志配置 -->
     <springProfile name="prod">
-        <root level="INFO">
+        <root level="warn">
             <appender-ref ref="SYSTEM_FILE" />
         </root>
     </springProfile>
