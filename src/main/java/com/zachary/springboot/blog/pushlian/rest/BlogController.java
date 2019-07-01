@@ -2,8 +2,8 @@ package com.zachary.springboot.blog.pushlian.rest;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,11 +17,15 @@ import com.zachary.springboot.blog.pushlian.util.EmsAuthEncryptUtil;
 @CrossOrigin(origins  = {"http://127.0.0.1:8080"})
 public class BlogController {
 	
-	@Resource
+	@Autowired
 	private IDemoService demoService;
 	
-	@Resource
+	@Autowired
 	private EmsAuthEncryptUtil emsAuthEncryptUtil;
+	
+	@Autowired
+	private StringRedisTemplate stringRedisTemplate;
+	
 	
 	@RequestMapping("/blog/1")
 	public List<RoncooUser> es1() {
@@ -32,8 +36,10 @@ public class BlogController {
 	
 	@RequestMapping("/blog/2")
 	public RoncooUser es2() {
+		stringRedisTemplate.opsForValue().set("s2", "001");
+		String s2=stringRedisTemplate.opsForValue().get("s2");
+		System.out.println(s2);
 		RoncooUser roncooUser=demoService.queryById(10);
-		roncooUser.setName(null);
 		String emsAuthEncry=emsAuthEncryptUtil.encrypt(roncooUser.getName());
 		String emsAuthDecry=emsAuthEncryptUtil.decrypt(emsAuthEncry);
 		System.out.println(emsAuthEncry+"\n"+emsAuthDecry);
