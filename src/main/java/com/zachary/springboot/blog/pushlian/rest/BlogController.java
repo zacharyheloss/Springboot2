@@ -33,6 +33,7 @@ public class BlogController {
 	@RequestMapping("/blog/2")
 	public RoncooUser es2() {
 		RoncooUser roncooUser=demoService.queryById(10);
+		roncooUser.setName(null);
 		String emsAuthEncry=emsAuthEncryptUtil.encrypt(roncooUser.getName());
 		String emsAuthDecry=emsAuthEncryptUtil.decrypt(emsAuthEncry);
 		System.out.println(emsAuthEncry+"\n"+emsAuthDecry);

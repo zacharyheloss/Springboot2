@@ -49,7 +49,7 @@ public class CorsConfiguration extends WebMvcConfigurationSupport {
 	protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 		FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
 		FastJsonConfig fastJsonConfig = new FastJsonConfig();
-		fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
+		fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteNullStringAsEmpty);
 		// 处理中文乱码问题
 		List<MediaType> fastMediaTypes = new ArrayList<>();
 		fastMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
