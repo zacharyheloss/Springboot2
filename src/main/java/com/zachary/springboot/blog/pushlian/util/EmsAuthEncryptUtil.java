@@ -55,6 +55,11 @@ public class EmsAuthEncryptUtil {
 		}
 	}
 
+	/**
+	 * 
+	 * @param 加密
+	 * @return
+	 */
 	public String encrypt(String dataSource) {
 		if (StringUtils.isEmpty(this.securityKey)) {
 			return dataSource;
@@ -78,6 +83,12 @@ public class EmsAuthEncryptUtil {
 		return "";
 	}
 
+	
+	/**
+	 * 
+	 * @param 解密
+	 * @return
+	 */
 	public String decrypt(String dataSource) {
 		if (StringUtils.isEmpty(this.securityKey)) {
 			return dataSource;
