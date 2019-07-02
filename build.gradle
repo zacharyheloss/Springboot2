@@ -61,3 +61,9 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+//配置环境
+def profileName = System.getProperty("profile") ?: "dev"
+processResources {
+    filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [profileName: profileName]
+}
