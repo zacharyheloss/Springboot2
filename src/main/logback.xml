@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<configuration>
+  <logger name="org.springframework" level="error"/>
+  <logger name="org.quartz" level="error" />
+  <logger name="org.apache" level="error" />
+  <logger name="org.mybatis" level="error" />
+  <logger name="RocketmqClient" level="error" />
+  <logger name="com.alibaba" level="error" />
+  <logger name="cn.uce.mq.rocket.exp" level="error" />
+  <logger name="RocketmqClient" level="error" />
+  <logger name="cn.uce.core.mq.api.producer" level="error" />
+  <logger name="cn.uce.web.common.filter.ModuleManager" level="error" />
+  
+  <!-- 日志存放路径，需要配置自己路径-->
+  <property name="log_dir" value="/uc/logs" />
+  
+  <!-- 日志显示名称，默认web.log -->
+  <property name="projectName" value="crm-web"/>  
+  
+  
+  <!-- 控制台输出日志 -->  
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">  
+    <encoder>  
+      <pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] [%logger:%line] --%mdc{client} %msg%n</pattern>  
+    </encoder>  
+  </appender>
+    
+  <!-- 文件日志  -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log_dir}/${projectName}.log</file>
+     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <!-- 日志保留最大size -->
+      <maxFileSize>1GB</maxFileSize>
+    </triggeringPolicy>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${log_dir}/bak/${projectName}.%i.log.zip</fileNamePattern>
+      <!-- 超过最大值后分割数 -->
+      <minIndex>1</minIndex>
+      <maxIndex>10</maxIndex>
+    </rollingPolicy>
+    <encoder>
+	  <pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] [%logger:%line] --%mdc{client} %msg%n</pattern>
+	</encoder>
+  </appender>
+        
+  <root level="debug">
+  	<appender-ref ref="STDOUT" /> 
+    <appender-ref ref="FILE" />
+  </root>
+</configuration>
