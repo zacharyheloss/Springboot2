@@ -2,12 +2,17 @@ package com.zachary.springboot.blog.pushlian.rest;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zachary.springboot.blog.pushlian.api.req.UserReq;
 import com.zachary.springboot.blog.pushlian.damain.RoncooUser;
 import com.zachary.springboot.blog.pushlian.service.IDemoService;
 import com.zachary.springboot.blog.pushlian.util.EmsAuthEncryptUtil;
@@ -46,5 +51,11 @@ public class BlogController {
 		return roncooUser;
 	}
 	
+	
+	
+	@RequestMapping(value = "/blog/3",method = RequestMethod.POST)
+	public UserReq es3(@Valid @RequestBody UserReq userReq) {
+		return userReq;
+	}
 
 }
