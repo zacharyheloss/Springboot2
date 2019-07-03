@@ -14,8 +14,11 @@ spring容器特性 ： 拦截器+ 过滤器+全局异常处理
 集成jsp-jstl、编译成War单独部署tomcat、jetty可正常访问
 
  集成redis集群 （底层通过lettuce 连接客户端，lettuce基于netty多线程并发性能高）
+ 
+增加Rest参数验证 hibernate.validator
 
 
+//脚本
 CREATE TABLE `roncoo_user` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(36) NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
