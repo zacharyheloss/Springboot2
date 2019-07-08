@@ -8,7 +8,6 @@
 
     <!-- 控制台输出 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <withJansi>true</withJansi>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
             <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %highlight([%-5level] [%logger:%line] --%mdc{client} %red(%msg%n))</pattern>
@@ -28,7 +27,7 @@
       		<!-- 超过最大值后分割数 -->
       		<minIndex>1</minIndex>
       		<maxIndex>10</maxIndex>
-    		</rollingPolicy>
+   		</rollingPolicy>
 	    <encoder>
 		  <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %highlight([%-5level] [%logger:%line] --%mdc{client} %red(%msg%n))</pattern>
 		</encoder>
